@@ -218,7 +218,7 @@ function Profile-Sync {
     git fetch --quiet
     $Status = git status --branch --porcelain
 
-    if ($Status -ccontains "behind") {
+    if ($Status -match "behind") {
         write-host "Updating"
         git pull --quiet
         Copy-Item -Path $LocalProfile -Destination $PROFILE -Force
