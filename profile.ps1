@@ -227,7 +227,7 @@ function Profile-Sync {
         write-host "Updated"
         git add $LocalProfile
         git commit -m "Profile sync"
-        git push --quiet
+        git push
     }
 
     # Pull changes from the remote repository
