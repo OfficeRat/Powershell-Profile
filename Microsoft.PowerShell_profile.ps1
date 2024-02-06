@@ -218,6 +218,7 @@ function Profile-Sync {
     $Status = git status --branch --porcelain
 
     if ($Status -ccontains "behind") {
+        write-host "Updating"
         git pull --quiet
         Copy-Item -Path $LocalProfile -Destination $PROFILE -Force
     } else {
@@ -227,6 +228,7 @@ function Profile-Sync {
         $hasChanges = git diff-index --quiet HEAD -- $LocalProfile
 
         if ($hasChanges -ne "") {
+            write-host "Uploading"
             git add $LocalProfile
             git commit -m "Profile sync"
             git push --quiet
