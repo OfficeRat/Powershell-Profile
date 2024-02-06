@@ -215,7 +215,7 @@ function Profile-Sync {
     Set-Location $PowerShellProfileLocation
 
     git fetch --quiet
-    $Status = git status --branch --porcelain
+    $Status = git status --branch --porcelain --quiet
 
     if ($Status -ccontains "behind") {
         write-host "Updating"
@@ -230,7 +230,7 @@ function Profile-Sync {
         if ($hasChanges -ne "") {
             write-host "Uploading"
             git add $LocalProfile
-            git commit -m "Profile sync"
+            git commit -m "Profile sync" --quiet
             git push --quiet
         } 
     }
