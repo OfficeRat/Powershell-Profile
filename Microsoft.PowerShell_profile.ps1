@@ -3,6 +3,8 @@ Set-Alias -Name cat -Value bat -Option AllScope
 
 $ohMyPoshInstalled = Get-Command oh-my-posh -ErrorAction SilentlyContinue
 
+$PowerShellProfileLocation = "$env:USERPROFILE\.powershellprofile\Microsoft.PowerShell_profile.ps1"
+
 if (-not $ohMyPoshInstalled) {
     $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
@@ -196,6 +198,18 @@ function useless-fact() {
         (Invoke-RestMethod -Uri "https://uselessfacts.jsph.pl/api/v2/facts/random").text
 
     }
+}
+
+
+function Profile-Sync {
+    try {
+        Get-ChildItem -Path "$env:USERPROFILE\.powershellprofile" -ErrorAction SilentlyContinue
+    }
+    catch {
+        New-Item -Path "$env:USERPROFILE\.powershellprofile" -ItemType Directory -Force
+    }
+    Copy-Item -Path $PROFILE -Destination $PowerShellProfileLocation
+    
 }
 
 function Profile-Help {
