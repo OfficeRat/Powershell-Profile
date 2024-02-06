@@ -1,5 +1,4 @@
 New-Alias -Name nano -Value Notepad
-New-Alias -Name tada -Value Write-Host TADA IT WORKS
 Set-Alias -Name cat -Value bat -Option AllScope
 
 $ohMyPoshInstalled = Get-Command oh-my-posh -ErrorAction SilentlyContinue
@@ -204,6 +203,8 @@ function useless-fact() {
 
 function Profile-Sync {
 
+    $currentDir = pwd
+
     $PowerShellProfileLocation = "$env:USERPROFILE\.powershellprofile"
     $LocalProfile = Join-Path -Path $PowerShellProfileLocation -ChildPath "Microsoft.PowerShell_profile.ps1"
 
@@ -235,6 +236,7 @@ function Profile-Sync {
             git push --quiet
         } 
     }
+    Set-Location $currentDir
 }
 
 
