@@ -14,6 +14,7 @@ if (-not $ohMyPoshInstalled) {
     }
     
     winget install --id=7zip.7zip -e
+    winget install sharkdp.bat
     winget install JanDeDobbeleer.OhMyPosh -s winget
     oh-my-posh font install FiraCode
 
@@ -97,17 +98,6 @@ function Download-File {
     Invoke-WebRequest -Uri $url -OutFile $destination
 }
 
-function Test-CompilerInstalled {
-    $compilerPath = Get-Command gcc -ErrorAction SilentlyContinue
-    if ($compilerPath) {
-        Write-Host "C compiler found: $($compilerPath.Source)" -ForegroundColor Green
-    }
-    else {
-        Write-Host "C compiler not found. Please install a C compiler." -ForegroundColor Red
-    }
-}
-
-
 
 function knock {
     Start-Job -ScriptBlock {Test-NetConnection -ComputerName "128.39.198.13" -Port 631 -InformationLevel Quiet} | Wait-Job -Timeout 1
@@ -187,19 +177,6 @@ function mac-lookup{
     Write-Host $response.company
 }
 
-function useless-fact() {
-    param (
-        [string]$Daily
-    )
-
-    if (-not $Daily -eq "" -or $Daily -eq "-d") {
-        (Invoke-RestMethod -Uri "https://uselessfacts.jsph.pl/api/v2/facts/today").text
-    } else {
-        (Invoke-RestMethod -Uri "https://uselessfacts.jsph.pl/api/v2/facts/random").text
-
-    }
-}
-
 
 function Profile-Sync {
 
@@ -240,7 +217,6 @@ function Profile-Sync {
 }
 
 
-
 function Profile-Help {
     param (
         [switch]$Detailed
@@ -248,7 +224,7 @@ function Profile-Help {
 
     Write-Host "Profile functions:"
         # Display only command names without detailed explanations
-        Get-Command -Name ifconfig, touch, Edit-Profile, Start-WebServer, New-Venv, Get-PublicIPAddress, Download-File, Go-Downloads, Go-Desktop, Profile-Help |
+        Get-Command -Name ifconfig, touch, Edit-Profile, Start-WebServer, New-Venv, Get-PublicIPAddress, Download-File, knock, Go-Desktop, Go-Downloads, Get-IpGeolocation, Test-PortOpen, Get-SystemInformation, Show-WifiPasswords, Mac-Lookup, Profile-Sync |
         ForEach-Object { Write-Host "`n$($_.Name)" -ForegroundColor Green }
 }
 
