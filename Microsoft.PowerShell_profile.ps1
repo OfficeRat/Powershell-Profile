@@ -215,7 +215,7 @@ function Profile-Sync {
     Set-Location $PowerShellProfileLocation
 
     git fetch --quiet
-    $Status = git status --branch --procelain
+    $Status = git status --branch --porcelain
 
     if ($Status -ccontains "behind") {
         git pull --quiet
