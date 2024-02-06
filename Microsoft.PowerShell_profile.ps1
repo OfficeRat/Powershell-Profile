@@ -202,15 +202,35 @@ function useless-fact() {
 
 
 function Profile-Sync {
-    try {
-        Get-ChildItem -Path "$env:USERPROFILE\.powershellprofile" -ErrorAction SilentlyContinue
+    # Define profile paths
+    $PowerShellProfileLocation = "$env:USERPROFILE\.powershellprofile"
+    $LocalProfile = Join-Path -Path $PowerShellProfileLocation -ChildPath "profile.ps1"
+
+    # Check if the local profile directory exists, if not, create it
+    if (-not (Test-Path -Path $PowerShellProfileLocation -PathType Container)) {
+        New-Item -Path $PowerShellProfileLocation -ItemType Directory -Force
     }
-    catch {
-        New-Item -Path "$env:USERPROFILE\.powershellprofile" -ItemType Directory -Force
+
+    # Copy the current profile to the local profile directory
+    Copy-Item -Path $PROFILE -Destination $LocalProfile -Force
+
+    # Change directory to the profile location
+    Set-Location $PowerShellProfileLocation
+
+    # Check if there are any changes to the local profile file
+    $hasChanges = git diff-index --quiet HEAD -- $LocalProfile
+
+    if ($hasChanges -eq $false) {
+        # Commit changes if there are any
+        git add $LocalProfile
+        git commit -m "Profile sync"
     }
-    Copy-Item -Path $PROFILE -Destination $PowerShellProfileLocation
-    
+
+    # Pull changes from the remote repository
+    git pull
 }
+
+
 
 function Profile-Help {
     param (
