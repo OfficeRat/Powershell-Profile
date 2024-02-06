@@ -1,5 +1,4 @@
 New-Alias -Name nano -Value Notepad
-New-Alias -Name Tada -Value Write-Host Tada it works the way you want!
 Set-Alias -Name cat -Value bat -Option AllScope
 
 $ohMyPoshInstalled = Get-Command oh-my-posh -ErrorAction SilentlyContinue
@@ -203,32 +202,36 @@ function useless-fact() {
 
 
 function Profile-Sync {
-    # Define profile paths
-    $PowerShellProfileLocation = "$env:USERPROFILE\.powershellprofile"
-    $LocalProfile = Join-Path -Path $PowerShellProfileLocation -ChildPath "profile.ps1"
 
-    # Check if the local profile directory exists, if not, create it
+    $PowerShellProfileLocation = "$env:USERPROFILE\.powershellprofile"
+    $LocalProfile = Join-Path -Path $PowerShellProfileLocation -ChildPath "Microsoft.PowerShell_profile.ps1"
+
+    
+
     if (-not (Test-Path -Path $PowerShellProfileLocation -PathType Container)) {
         New-Item -Path $PowerShellProfileLocation -ItemType Directory -Force
     }
 
-    # Copy the current profile to the local profile directory
-    Copy-Item -Path $PROFILE -Destination $LocalProfile -Force
-
-    # Change directory to the profile location
     Set-Location $PowerShellProfileLocation
 
-    # Check if there are any changes to the local profile file
-    $hasChanges = git diff-index --quiet HEAD -- $LocalProfile
+    git fetch --quiet
+    $Status = git status --branch --procelain
 
-    if ($hasChanges -eq $false) {
-        # Commit changes if there are any
-        git add $LocalProfile
-        git commit -m "Profile sync"
+    if ($Status -ccontains "behind") {
+        git pull --quiet
+        Copy-Item -Path $LocalProfile -Destination $PROFILE -Force
+    } else {
+
+        Copy-Item -Path $PROFILE -Destination $LocalProfile -Force
+        Set-Location $PowerShellProfileLocation
+        $hasChanges = git diff-index --quiet HEAD -- $LocalProfile
+
+        if ($hasChanges -ne "") {
+            git add $LocalProfile
+            git commit -m "Profile sync"
+            git push --quiet
+        } 
     }
-
-    # Pull changes from the remote repository
-    git pull
 }
 
 
