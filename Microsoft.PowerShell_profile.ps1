@@ -1,4 +1,5 @@
 New-Alias -Name nano -Value Notepad
+New-Alias -Name tada -Value Write-Host TADA IT WORKS
 Set-Alias -Name cat -Value bat -Option AllScope
 
 $ohMyPoshInstalled = Get-Command oh-my-posh -ErrorAction SilentlyContinue
