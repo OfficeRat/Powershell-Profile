@@ -208,7 +208,7 @@ function Profile-Sync {
 
         if ($hasChanges -ne "") {
             write-host "Uploading"
-            git add $LocalProfile
+            git add $LocalProfile 
             git commit -m "Profile sync" --quiet
             git push --quiet
         } 
