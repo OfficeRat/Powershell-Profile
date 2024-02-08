@@ -1,46 +1,44 @@
 New-Alias -Name nano -Value Notepad
 Set-Alias -Name cat -Value bat -Option AllScope
 
-function Init-Profile {
 
-    $ohMyPoshInstalled = Get-Command oh-my-posh -ErrorAction SilentlyContinue
 
-    $sshConfig = ((Get-Content -Path "~/.ssh/config" -ErrorAction SilentlyContinue) -match '^Host\s+(.+)') -replace '^Host\s+' | ForEach-Object { $_.Split(' ') }
+$ohMyPoshInstalled = Get-Command oh-my-posh -ErrorAction SilentlyContinue
+
+$sshConfig = ((Get-Content -Path "~/.ssh/config" -ErrorAction SilentlyContinue) -match '^Host\s+(.+)') -replace '^Host\s+' | ForEach-Object { $_.Split(' ') }
     
-    $PowerShellProfileLocation = "$env:USERPROFILE\.powershellprofile\Microsoft.PowerShell_profile.ps1"
+$PowerShellProfileLocation = "$env:USERPROFILE\.powershellprofile\Microsoft.PowerShell_profile.ps1"
     
-    if (-not $ohMyPoshInstalled) {
-        $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+if (-not $ohMyPoshInstalled) {
+    $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
     
-        if (-not $isAdmin) {
-            Write-Host "First time this Profile is ran it needs to be ran as admin"
-            Exit
-        }
-        
-        winget install --id=7zip.7zip -e
-        winget install sharkdp.bat
-        winget install JanDeDobbeleer.OhMyPosh -s winget
-        oh-my-posh font install FiraCode
-    
-        $settingsPath = "$env:USERPROFILE\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
-        $jsonContent = Get-Content -Path $settingsPath | ConvertFrom-Json
-    
-        $jsonContent.profiles.defaults.font.Face = 'FiraCode Nerd Font'
-    
-        $jsonContent | ConvertTo-Json | Set-Content -Path $settingsPath
-    
-        Write-Host "Oh-My-Posh is initialized with the provided configuration, and Windows Terminal font is set to FiraCode Nerd Font. There might be some issues with the font so go and check that it's set correctly"
-    
-    
-        
+    if (-not $isAdmin) {
+        Write-Host "First time this Profile is ran it needs to be ran as admin"
+        Exit
     }
-    else {
-        oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/catppuccin_macchiato.omp.json' | Invoke-Expression
-    }
-
-    touch C:\Users\Maha\Documents\WindowsPowerShell\configured
+        
+    winget install --id=7zip.7zip -e
+    winget install sharkdp.bat
+    winget install JanDeDobbeleer.OhMyPosh -s winget
+    oh-my-posh font install FiraCode
     
+    $settingsPath = "$env:USERPROFILE\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+    $jsonContent = Get-Content -Path $settingsPath | ConvertFrom-Json
+    
+    $jsonContent.profiles.defaults.font.Face = 'FiraCode Nerd Font'
+    
+    $jsonContent | ConvertTo-Json | Set-Content -Path $settingsPath
+    
+    Write-Host "Oh-My-Posh is initialized with the provided configuration, and Windows Terminal font is set to FiraCode Nerd Font. There might be some issues with the font so go and check that it's set correctly"
+    
+    
+        
 }
+else {
+    oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/catppuccin_macchiato.omp.json' | Invoke-Expression
+}
+    
+
 
 function ifconfig ($name) { 
     if ($null -eq $name) {
@@ -108,10 +106,10 @@ function Download-File {
 
 
 function knock {
-    Start-Job -ScriptBlock {Test-NetConnection -ComputerName "128.39.198.13" -Port 631 -InformationLevel Quiet} | Wait-Job -Timeout 1
-    Start-Job -ScriptBlock {Test-NetConnection -ComputerName "128.39.198.13" -Port 123 -InformationLevel Quiet} | Wait-Job -Timeout 1
-    Start-Job -ScriptBlock {Test-NetConnection -ComputerName "128.39.198.13" -Port 80 -InformationLevel Quiet} | Wait-Job -Timeout 1
-    Start-Job -ScriptBlock {Test-NetConnection -ComputerName "128.39.198.13" -Port 443 -InformationLevel Quiet} | Wait-Job -Timeout 1
+    Start-Job -ScriptBlock { Test-NetConnection -ComputerName "128.39.198.13" -Port 631 -InformationLevel Quiet } | Wait-Job -Timeout 1
+    Start-Job -ScriptBlock { Test-NetConnection -ComputerName "128.39.198.13" -Port 123 -InformationLevel Quiet } | Wait-Job -Timeout 1
+    Start-Job -ScriptBlock { Test-NetConnection -ComputerName "128.39.198.13" -Port 80 -InformationLevel Quiet } | Wait-Job -Timeout 1
+    Start-Job -ScriptBlock { Test-NetConnection -ComputerName "128.39.198.13" -Port 443 -InformationLevel Quiet } | Wait-Job -Timeout 1
     code --remote ssh-remote+"dhcp.ssn"
 }
 
@@ -165,7 +163,7 @@ function Show-WiFiPasswords {
     }
 }
 
-function mac-lookup{
+function mac-lookup {
     param (
         [string]$macAddress
     )
@@ -209,7 +207,8 @@ function Profile-Sync {
         write-host "Updating"
         git pull --quiet
         Copy-Item -Path $LocalProfile -Destination $PROFILE -Force
-    } else {
+    }
+    else {
 
         Copy-Item -Path $PROFILE -Destination $LocalProfile -Force
         Set-Location $PowerShellProfileLocation
@@ -228,7 +227,7 @@ function Profile-Sync {
 
 function Remote-Code {
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$Server
     )
 
@@ -254,9 +253,9 @@ function Profile-Help {
     )
 
     Write-Host "Profile functions:"
-        # Display only command names without detailed explanations
-        Get-Command -Name ifconfig, touch, Edit-Profile, Start-WebServer, New-Venv, Get-PublicIPAddress, Download-File, knock, Go-Desktop, Go-Downloads, Get-IpGeolocation, Test-PortOpen, Get-SystemInformation, Show-WifiPasswords, Mac-Lookup, Profile-Sync |
-        ForEach-Object { Write-Host "`n$($_.Name)" -ForegroundColor Green }
+    # Display only command names without detailed explanations
+    Get-Command -Name ifconfig, touch, Edit-Profile, Start-WebServer, New-Venv, Get-PublicIPAddress, Download-File, knock, Go-Desktop, Go-Downloads, Get-IpGeolocation, Test-PortOpen, Get-SystemInformation, Show-WifiPasswords, Mac-Lookup, Profile-Sync |
+    ForEach-Object { Write-Host "`n$($_.Name)" -ForegroundColor Green }
 }
 
 
