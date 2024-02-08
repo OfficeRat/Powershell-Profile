@@ -1,37 +1,45 @@
 New-Alias -Name nano -Value Notepad
 Set-Alias -Name cat -Value bat -Option AllScope
 
-$ohMyPoshInstalled = Get-Command oh-my-posh -ErrorAction SilentlyContinue
+function Init-Profile {
 
-$PowerShellProfileLocation = "$env:USERPROFILE\.powershellprofile\Microsoft.PowerShell_profile.ps1"
+    $ohMyPoshInstalled = Get-Command oh-my-posh -ErrorAction SilentlyContinue
 
-if (-not $ohMyPoshInstalled) {
-    $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-
-    if (-not $isAdmin) {
-        Write-Host "First time this Profile is ran it needs to be ran as admin"
-        Exit
+    $sshConfig = ((Get-Content -Path "~/.ssh/config" -ErrorAction SilentlyContinue) -match '^Host\s+(.+)') -replace '^Host\s+' | ForEach-Object { $_.Split(' ') }
+    
+    $PowerShellProfileLocation = "$env:USERPROFILE\.powershellprofile\Microsoft.PowerShell_profile.ps1"
+    
+    if (-not $ohMyPoshInstalled) {
+        $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    
+        if (-not $isAdmin) {
+            Write-Host "First time this Profile is ran it needs to be ran as admin"
+            Exit
+        }
+        
+        winget install --id=7zip.7zip -e
+        winget install sharkdp.bat
+        winget install JanDeDobbeleer.OhMyPosh -s winget
+        oh-my-posh font install FiraCode
+    
+        $settingsPath = "$env:USERPROFILE\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+        $jsonContent = Get-Content -Path $settingsPath | ConvertFrom-Json
+    
+        $jsonContent.profiles.defaults.font.Face = 'FiraCode Nerd Font'
+    
+        $jsonContent | ConvertTo-Json | Set-Content -Path $settingsPath
+    
+        Write-Host "Oh-My-Posh is initialized with the provided configuration, and Windows Terminal font is set to FiraCode Nerd Font. There might be some issues with the font so go and check that it's set correctly"
+    
+    
+        
     }
+    else {
+        oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/catppuccin_macchiato.omp.json' | Invoke-Expression
+    }
+
+    touch C:\Users\Maha\Documents\WindowsPowerShell\configured
     
-    winget install --id=7zip.7zip -e
-    winget install sharkdp.bat
-    winget install JanDeDobbeleer.OhMyPosh -s winget
-    oh-my-posh font install FiraCode
-
-    $settingsPath = "$env:USERPROFILE\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
-    $jsonContent = Get-Content -Path $settingsPath | ConvertFrom-Json
-
-    $jsonContent.profiles.defaults.font.Face = 'FiraCode Nerd Font'
-
-    $jsonContent | ConvertTo-Json | Set-Content -Path $settingsPath
-
-    Write-Host "Oh-My-Posh is initialized with the provided configuration, and Windows Terminal font is set to FiraCode Nerd Font. There might be some issues with the font so go and check that it's set correctly"
-
-
-    
-}
-else {
-    oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/catppuccin_macchiato.omp.json' | Invoke-Expression
 }
 
 function ifconfig ($name) { 
@@ -108,6 +116,7 @@ function knock {
 }
 
 function Go-Desktop {
+    
     Set-Location $([System.IO.Path]::Combine([System.Environment]::GetFolderPath('Desktop')))
 }
 
@@ -215,6 +224,28 @@ function Profile-Sync {
     }
     Set-Location $currentDir
 }
+
+
+function Remote-Code {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$Server
+    )
+
+    if ($Server -contains "list") {
+        write-host $sshConfig
+        return
+    }
+
+    if ($sshConfig -notcontains $Server) {
+        Write-Host "Hostname not recognized"
+        return
+    }
+
+    code --remote ssh-remote+$Server
+
+}
+
 
 
 function Profile-Help {
