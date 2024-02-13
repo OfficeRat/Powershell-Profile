@@ -2,9 +2,7 @@ New-Alias -Name nano -Value Notepad
 Set-Alias -Name cat -Value bat -Option AllScope
 
 $ohMyPoshInstalled = Get-Command oh-my-posh -ErrorAction SilentlyContinue
-
 $sshConfig = ((Get-Content -Path "~/.ssh/config" -ErrorAction SilentlyContinue) -match '^Host\s+(.+)') -replace '^Host\s+' | ForEach-Object { $_.Split(' ') }
-    
 $PowerShellProfileLocation = "$env:USERPROFILE\.powershellprofile\Microsoft.PowerShell_profile.ps1"
     
 if (-not $ohMyPoshInstalled) {
@@ -257,9 +255,26 @@ function Profile-Help {
 }
 
 function check-for-update {
+    write-host "Checking for profile updates"
+    $currentdir = pwd
+
+    $PowerShellProfileLocation = "$env:USERPROFILE\.powershellprofile"
+
+    Set-Location $PowerShellProfileLocation
+
+    git fetch --quiet
+    $Status = git status --branch --porcelain
+
+    if ($Status -match "behind") {
+        write-host "Updating"
+        git pull --quiet
+        Copy-Item -Path $LocalProfile -Destination $PROFILE -Force
+    } else{
+        write-host "No updates available"
+    }
     
+    Set-Location $currentdir
 }
 
-
-
+check-for-update
 
