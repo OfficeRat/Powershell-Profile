@@ -1,8 +1,6 @@
 New-Alias -Name nano -Value Notepad
 Set-Alias -Name cat -Value bat -Option AllScope
 
-
-
 $ohMyPoshInstalled = Get-Command oh-my-posh -ErrorAction SilentlyContinue
 
 $sshConfig = ((Get-Content -Path "~/.ssh/config" -ErrorAction SilentlyContinue) -match '^Host\s+(.+)') -replace '^Host\s+' | ForEach-Object { $_.Split(' ') }
@@ -257,5 +255,11 @@ function Profile-Help {
     Get-Command -Name ifconfig, touch, Edit-Profile, Start-WebServer, New-Venv, Get-PublicIPAddress, Download-File, knock, Go-Desktop, Go-Downloads, Get-IpGeolocation, Test-PortOpen, Get-SystemInformation, Show-WifiPasswords, Mac-Lookup, Profile-Sync |
     ForEach-Object { Write-Host "`n$($_.Name)" -ForegroundColor Green }
 }
+
+function check-for-update {
+    
+}
+
+
 
 
